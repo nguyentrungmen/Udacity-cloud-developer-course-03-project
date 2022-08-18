@@ -1,0 +1,37 @@
+
+kubectl apply -f aws-secret.yaml
+kubectl apply -f env-secret.yaml
+kubectl apply -f env-configmap.yaml
+kubectl apply -f backend-feed-api-deployment.yaml
+kubectl apply -f backend-user-api-deployment.yaml
+kubectl apply -f reverseproxy-deployment.yaml
+kubectl apply -f frontend-deployment.yaml
+kubectl apply -f backend-feed-service.yaml
+kubectl apply -f backend-user-service.yaml
+kubectl apply -f reverseproxy-service.yaml
+kubectl apply -f frontend-service.yaml
+
+kubectl port-forward frontend-855557f49b-lpp5p 8100:8100
+kubectl expose deployment frontend --type=LoadBalancer --name=publicfrontend
+kubectl expose deployment reverseproxy --type=LoadBalancer --name=publicreverseproxy
+
+publicreverseproxy
+a1211f28eaf26446b81dd57e0cac3d9a-1886035592.us-east-1.elb.amazonaws.com 
+
+publicfrontend
+a7210cc13be0c44a786feca97242b621-2142874564.us-east-1.elb.amazonaws.com => access on browser
+
+docker build . -t nguyentrungmen/udagram-frontend:v2
+
+docker login --username=nguyentrungmen
+
+docker push nguyentrungmen/udagram-frontend:v2
+
+kubectl set image deployment frontend frontend=nguyentrungmen/udagram-frontend:v2
+
+
+kubectl logs -f frontend-855557f49b-lpp5p
+
+kubectl describe pod frontend-855557f49b-lpp5p
+
+kubectl logs backend-feed-75f8c5bcb4-hw6zx -p
